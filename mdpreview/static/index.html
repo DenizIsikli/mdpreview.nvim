@@ -1,9 +1,19 @@
-<script>
-  const ws = new WebSocket("ws://localhost:3000/ws");
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <script>
+      window.onload = () => {
+        const ws = new WebSocket("ws://localhost:3000/ws");
 
-  ws.onmessage = (e) => {
-    document.body.innerHTML = e.data;
-  };
+        ws.onmessage = (e) => {
+          document.body.innerHTML = e.data;
+        };
 
-  document.body.innerHTML = "<p>Waiting for content...</p>";
-</script>
+        document.body.innerHTML = "<p>Waiting for content...</p>";
+      };
+    </script>
+  </body>
+</html>
