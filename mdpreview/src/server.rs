@@ -28,7 +28,9 @@ pub async fn run() {
         exe_dir.join("../../static")
     } else {
         exe_dir.join("../mdpreview/static")
-    };
+    }
+    .canonicalize()
+    .unwrap();
 
     let index_path = static_path.join("index.html");
 

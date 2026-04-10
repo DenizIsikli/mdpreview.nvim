@@ -21,17 +21,22 @@ function M.setup()
 		if not job_id then
 			local plugin_path = debug.getinfo(1, "S").source:sub(2):match("(.*/)")
 			plugin_path = plugin_path .. "../../"
-			if vim.fn.isdirectory(plugin_path) == 0 then
-				plugin_path = vim.fn.getcwd()
-			end
 
 			local bin = plugin_path .. "/bin/mdpreview"
+
 			if vim.fn.filereadable(bin) == 0 then
-				vim.notify("mdpreview binary not found. Build it first.", vim.log.levels.ERROR)
+				vim.notify("mdpreview binary not found.", vim.log.levels.ERROR)
 				return
 			end
 
-			job_id = vim.fn.jobstart({ bin }, { detach = true })
+			job_id = vim.fn.jobstart({ bin }, {
+				detach = true,
+				on_stderr = function(_, data)
+					if data then
+						print("ERR:", table.concat(data, "\n"))
+					end
+				end,
+			})
 		end
 
 		vim.fn.jobstart({ "xdg-open", "http://localhost:3000" }, { detach = true })
