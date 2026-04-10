@@ -1,0 +1,1 @@
+/home/deniz/Code/mdpreview.nvim/mdpreview/target/release/mdpreview: /home/deniz/Code/mdpreview.nvim/mdpreview/src/main.rs /home/deniz/Code/mdpreview.nvim/mdpreview/src/markdown.rs /home/deniz/Code/mdpreview.nvim/mdpreview/src/server.rs /home/deniz/Code/mdpreview.nvim/mdpreview/src/state.rs /home/deniz/Code/mdpreview.nvim/mdpreview/src/websocket.rs

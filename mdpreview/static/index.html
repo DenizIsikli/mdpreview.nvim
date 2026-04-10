@@ -1,0 +1,4 @@
+<script>
+  const ws = new WebSocket("ws://localhost:3000/ws");
+  ws.onmessage = (e) => (document.body.innerHTML = e.data);
+</script>
