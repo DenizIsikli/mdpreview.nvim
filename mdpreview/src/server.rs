@@ -1,10 +1,11 @@
 use axum::extract::State;
+use axum::response::{Html, IntoResponse};
 use axum::{
     routing::{get, post},
     Router,
 };
 use tokio::sync::broadcast;
-use tower_http::services::{ServeDir, ServeFile};
+use tower_http::services::ServeDir;
 
 use crate::state::AppState;
 use crate::websocket::ws_handler;
@@ -29,14 +30,23 @@ pub async fn run() {
         exe_dir.join("../mdpreview/static")
     };
 
+    let index_path = static_path.join("index.html");
+
+    async fn index(path: std::path::PathBuf) -> impl IntoResponse {
+        Html(std::fs::read_to_string(path).unwrap())
+    }
+
     let app = Router::new()
+        .route(
+            "/",
+            get({
+                let index_path = index_path.clone();
+                move || index(index_path.clone())
+            }),
+        )
         .route("/ws", get(ws_handler))
         .route("/update", post(update_markdown))
-        .nest_service(
-            "/",
-            ServeDir::new(static_path.clone())
-                .not_found_service(ServeFile::new(static_path.join("index.html"))),
-        )
+        .nest_service("/", ServeDir::new(static_path))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
@@ -55,4 +65,3 @@ pub async fn update_markdown(State(state): State<AppState>, body: String) {
 
     let _ = state.tx.send(html);
 }
-// TEST
