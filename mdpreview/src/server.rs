@@ -54,7 +54,7 @@ pub async fn run() {
         .route("/", get(index))
         .route("/ws", get(ws_handler))
         .route("/update", post(update_markdown))
-        .nest_service("/", ServeDir::new(static_path))
+        .nest_service("/static", ServeDir::new(static_path))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
