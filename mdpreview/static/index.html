@@ -2,17 +2,31 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <title>Markdown Preview</title>
+    <link rel="stylesheet" href="/static/index.css" />
   </head>
   <body>
+    <div id="app">
+      <div class="toolbar">
+        <button id="copy-btn">Copy HTML</button>
+      </div>
+      <div id="content">
+        <p class="placeholder">Waiting for content...</p>
+      </div>
+    </div>
+
     <script>
-      window.onload = () => {
-        const ws = new WebSocket("ws://localhost:3000/ws");
+      let latestHTML = "";
 
-        ws.onmessage = (e) => {
-          document.body.innerHTML = e.data;
-        };
+      const ws = new WebSocket("ws://localhost:3000/ws");
 
-        document.body.innerHTML = "<p>Waiting for content...</p>";
+      ws.onmessage = (e) => {
+        latestHTML = e.data;
+        document.getElementById("content").innerHTML = e.data;
+      };
+
+      document.getElementById("copy-btn").onclick = () => {
+        navigator.clipboard.writeText(latestHTML);
       };
     </script>
   </body>
