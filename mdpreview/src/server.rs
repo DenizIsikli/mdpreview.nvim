@@ -4,7 +4,7 @@ use axum::{
     Router,
 };
 use tokio::sync::broadcast;
-use tower_http::services::ServeDir;
+use tower_http::services::{ServeDir, ServeFile};
 
 use crate::state::AppState;
 use crate::websocket::ws_handler;
@@ -32,7 +32,11 @@ pub async fn run() {
     let app = Router::new()
         .route("/ws", get(ws_handler))
         .route("/update", post(update_markdown))
-        .nest_service("/", ServeDir::new(static_path))
+        .nest_service(
+            "/",
+            ServeDir::new(static_path.clone())
+                .not_found_service(ServeFile::new(static_path.join("index.html"))),
+        )
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
