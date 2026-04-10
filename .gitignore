@@ -1,0 +1,15 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Neovim / Lua (optional)
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
