@@ -24,7 +24,7 @@ function M.setup()
 				plugin_path = vim.fn.getcwd()
 			end
 
-			local bin = plugin_path .. "/mdpreview/target/release/mdpreview"
+			local bin = plugin_path .. "../../mdpreview/target/release/mdpreview"
 			if vim.fn.filereadable(bin) == 0 then
 				vim.notify("mdpreview binary not found. Build it first.", vim.log.levels.ERROR)
 				return
