@@ -19,12 +19,13 @@ end
 function M.setup()
 	vim.api.nvim_create_user_command("MarkdownPreview", function()
 		if not job_id then
-			local plugin_path = vim.fn.stdpath("data") .. "/lazy/mdpreview.nvim"
+			local plugin_path = debug.getinfo(1, "S").source:sub(2):match("(.*/)")
+			plugin_path = plugin_path .. "../../"
 			if vim.fn.isdirectory(plugin_path) == 0 then
 				plugin_path = vim.fn.getcwd()
 			end
 
-			local bin = plugin_path .. "../../mdpreview/target/release/mdpreview"
+			local bin = plugin_path .. "/bin/mdpreview"
 			if vim.fn.filereadable(bin) == 0 then
 				vim.notify("mdpreview binary not found. Build it first.", vim.log.levels.ERROR)
 				return
