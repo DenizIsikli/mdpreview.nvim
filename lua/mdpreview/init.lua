@@ -1,19 +1,33 @@
 local M = {}
 
 local job_id = nil
+local timer = nil
 
 local function send()
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 	local content = table.concat(lines, "\n")
+	local file_dir = vim.fn.expand("%:p:h")
 
 	vim.fn.jobstart({
 		"curl",
 		"-X",
 		"POST",
 		"http://localhost:3000/update",
+		"-H",
+		"X-Base-Dir: " .. file_dir,
 		"--data-binary",
 		content,
 	}, { detach = true })
+end
+
+local function send_debounced()
+	if timer then
+		timer:stop()
+	end
+
+	timer = vim.defer_fn(function()
+		send()
+	end, 400)
 end
 
 function M.setup()
@@ -37,9 +51,15 @@ function M.setup()
 					end
 				end,
 			})
+
+			vim.schedule(function()
+				send()
+			end)
 		end
 
-		vim.fn.jobstart({ "xdg-open", "http://localhost:3000" }, { detach = true })
+		vim.defer_fn(function()
+			vim.fn.jobstart({ "xdg-open", "http://localhost:3000" }, { detach = true })
+		end, 300)
 	end, {})
 
 	vim.api.nvim_create_user_command("MarkdownPreviewStop", function()
@@ -49,9 +69,33 @@ function M.setup()
 		end
 	end, {})
 
-	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI" }, {
+	vim.api.nvim_create_autocmd("BufEnter", {
+		callback = function()
+			if vim.bo.filetype ~= "markdown" then
+				if job_id then
+					vim.fn.jobstop(job_id)
+					job_id = nil
+				end
+			end
+		end,
+	})
+
+	vim.api.nvim_create_autocmd("VimLeavePre", {
+		callback = function()
+			if job_id then
+				vim.fn.jobstop(job_id)
+				job_id = nil
+			end
+		end,
+	})
+
+	vim.api.nvim_create_autocmd({ "TextChanged", "BufEnter", "BufWritePost" }, {
 		pattern = "*.md",
-		callback = send,
+		callback = function()
+			if job_id then
+				send_debounced()
+			end
+		end,
 	})
 end
 

@@ -4,29 +4,131 @@
     <meta charset="UTF-8" />
     <title>Markdown Preview</title>
     <link rel="stylesheet" href="/static/index.css" />
+    <link rel="icon" href="/static/favicon.ico" />
+    <style>
+      #content {
+        overflow: auto;
+        scroll-behavior: smooth;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
-      <div class="toolbar">
-        <button id="copy-btn">Copy HTML</button>
-      </div>
-      <div id="content">
-        <p class="placeholder">Waiting for content...</p>
+      <div id="wrapper">
+        <div class="toolbar">
+          <button id="copy-btn">Copy HTML</button>
+          <button id="copy-md">Copy Markdown</button>
+        </div>
+
+        <div id="main">
+          <details id="toc">
+            <summary>Contents</summary>
+            <div id="toc-list"></div>
+          </details>
+
+          <div id="content">
+            <p class="placeholder">Waiting for content...</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <script>
       let latestHTML = "";
 
+      const content = document.getElementById("content");
+      const tocList = document.getElementById("toc-list");
       const ws = new WebSocket("ws://localhost:3000/ws");
 
+      let timeout;
+
       ws.onmessage = (e) => {
-        latestHTML = e.data;
-        document.getElementById("content").innerHTML = e.data;
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+          const prevScrollRatio =
+            content.scrollTop / (content.scrollHeight || 1);
+
+          try {
+            const data = JSON.parse(e.data);
+            latestHTML = data.html || "";
+          } catch {
+            latestHTML = e.data;
+          }
+
+          content.innerHTML = latestHTML;
+          buildTOC();
+
+          content.scrollTop = prevScrollRatio * content.scrollHeight;
+        }, 100);
       };
 
+      function buildTOC() {
+        tocList.innerHTML = "";
+
+        const headings = content.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+        headings.forEach((h, i) => {
+          const id = "heading-" + i;
+          h.id = id;
+
+          const level = parseInt(h.tagName[1]);
+
+          const item = document.createElement("div");
+          item.className = `toc-item toc-h${level}`;
+          item.style.marginLeft = (level - 1) * 10 + "px";
+
+          const bullet = document.createElement("span");
+
+          const text = document.createElement("span");
+          text.textContent = h.textContent;
+
+          item.appendChild(bullet);
+          item.appendChild(text);
+
+          item.onclick = () => {
+            h.scrollIntoView({ behavior: "smooth", block: "start" });
+          };
+
+          tocList.appendChild(item);
+        });
+      }
+
+      function notify(msg) {
+        if (Notification.permission === "granted") {
+          new Notification(msg);
+        } else if (Notification.permission !== "denied") {
+          Notification.requestPermission().then((perm) => {
+            if (perm === "granted") {
+              new Notification(msg);
+            } else {
+              alert(msg);
+            }
+          });
+        } else {
+          alert(msg);
+        }
+      }
+
+      function fallbackCopy(text) {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
       document.getElementById("copy-btn").onclick = () => {
-        navigator.clipboard.writeText(latestHTML);
+        if (!latestHTML) return notify("No HTML to copy");
+
+        navigator.clipboard
+          .writeText(latestHTML)
+          .then(() => notify("HTML copied!"))
+          .catch(() => {
+            fallbackCopy(latestHTML);
+            notify("HTML copied (fallback)!");
+          });
       };
     </script>
   </body>
