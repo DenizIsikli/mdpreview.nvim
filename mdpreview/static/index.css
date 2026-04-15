@@ -60,6 +60,24 @@ body {
   box-shadow: 0 0 0 1px var(--border);
 }
 
+a {
+  color: var(--light-blue);
+  text-decoration: none;
+}
+
+a:visited {
+  color: #8ab4f8;
+}
+
+a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+a:active {
+  color: var(--primary);
+}
+
 #toc {
   position: fixed;
   left: calc(50% - 450px - 235px);
