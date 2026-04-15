@@ -21,7 +21,8 @@ local function send()
 end
 
 local function send_cursor()
-	local row, col = table.unpack(vim.api.nvim_win_get_cursor(0))
+	local unpack = unpack or table.unpack
+	local row, col = unpack(vim.api.nvim_win_get_cursor(0))
 
 	vim.fn.jobstart({
 		"curl",
