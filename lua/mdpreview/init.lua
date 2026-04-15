@@ -24,7 +24,7 @@ local timer = vim.loop.new_timer()
 
 local function send_debounced()
 	timer:stop()
-	timer:start(400, 0, vim.schedule_wrap(send))
+	timer:start(100, 0, vim.schedule_wrap(send))
 end
 
 function M.setup()
@@ -86,6 +86,17 @@ function M.setup()
 		end,
 	})
 
+	vim.api.nvim_create_autocmd("BufEnter", {
+		callback = function()
+			if vim.bo.filetype ~= "markdown" then
+				if job_id then
+					vim.fn.jobstop(job_id)
+					job_id = nil
+				end
+			end
+		end,
+	})
+
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = "markdown",
 		callback = function()
@@ -95,7 +106,16 @@ function M.setup()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "BufWritePost" }, {
+	vim.api.nvim_create_autocmd("InsertLeave", {
+		pattern = "*.md",
+		callback = function()
+			if job_id then
+				send()
+			end
+		end,
+	})
+
+	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP", "BufWritePost" }, {
 		pattern = "*.md",
 		callback = function()
 			if job_id then
