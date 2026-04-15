@@ -1,6 +1,7 @@
 use axum::extract::{Query, State};
 use axum::http::HeaderMap;
 use axum::response::{Html, IntoResponse};
+use axum::Json;
 use axum::{
     routing::{get, post},
     Router,
@@ -9,7 +10,7 @@ use std::{collections::HashMap, fs, path::PathBuf};
 use tokio::sync::broadcast;
 use tower_http::services::ServeDir;
 
-use crate::state::AppState;
+use crate::state::{AppState, CursorPayload};
 use crate::websocket::ws_handler;
 
 async fn index() -> impl IntoResponse {
@@ -47,6 +48,36 @@ async fn img(
     ([("Content-Type", "text/plain")], b"not found".to_vec())
 }
 
+pub async fn update_markdown(State(state): State<AppState>, headers: HeaderMap, body: String) {
+    let base_dir = headers
+        .get("x-base-dir")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("")
+        .to_string();
+
+    {
+        let mut base = state.base_dir.lock().unwrap();
+        *base = base_dir;
+    }
+
+    let html = crate::markdown::render_markdown(&body);
+    {
+        let mut html_lock = state.html.lock().unwrap();
+        *html_lock = html.clone();
+    }
+
+    let _ = state.tx.send(html);
+}
+
+pub async fn update_cursor(State(state): State<AppState>, Json(payload): Json<CursorPayload>) {
+    let msg = format!(
+        r#"{{"type":"cursor","line":{},"col":{}}}"#,
+        payload.line, payload.col
+    );
+
+    let _ = state.tx.send(msg);
+}
+
 pub async fn run() {
     let (tx, _) = broadcast::channel::<String>(100);
 
@@ -75,6 +106,7 @@ pub async fn run() {
         .route("/ws", get(ws_handler))
         .route("/img", get(img))
         .route("/update", post(update_markdown))
+        .route("/cursor", post(update_cursor))
         .nest_service("/static", ServeDir::new(static_path))
         .with_state(state);
 
@@ -83,25 +115,4 @@ pub async fn run() {
         .unwrap();
 
     axum::serve(listener, app).await.unwrap();
-}
-
-pub async fn update_markdown(State(state): State<AppState>, headers: HeaderMap, body: String) {
-    let base_dir = headers
-        .get("x-base-dir")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("")
-        .to_string();
-
-    {
-        let mut base = state.base_dir.lock().unwrap();
-        *base = base_dir;
-    }
-
-    let html = crate::markdown::render_markdown(&body);
-    {
-        let mut html_lock = state.html.lock().unwrap();
-        *html_lock = html.clone();
-    }
-
-    let _ = state.tx.send(html);
 }

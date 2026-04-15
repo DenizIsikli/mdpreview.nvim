@@ -20,11 +20,33 @@ local function send()
 	}, { detach = true })
 end
 
+local function send_cursor()
+	local row, col = table.unpack(vim.api.nvim_win_get_cursor(0))
+
+	vim.fn.jobstart({
+		"curl",
+		"-X",
+		"POST",
+		"http://localhost:3000/cursor",
+		"-H",
+		"Content-Type: application/json",
+		"-d",
+		string.format('{"line": %d, "col": %d}', row, col),
+	}, { detach = true })
+end
+
 local timer = vim.loop.new_timer()
 
 local function send_debounced()
 	timer:stop()
 	timer:start(100, 0, vim.schedule_wrap(send))
+end
+
+local cursor_timer = vim.loop.new_timer()
+
+local function send_cursor_debounced()
+	cursor_timer:stop()
+	cursor_timer:start(50, 0, vim.schedule_wrap(send_cursor))
 end
 
 function M.setup()
@@ -49,7 +71,7 @@ function M.setup()
 				end,
 			})
 
-			vim.schedule(function()
+			vim.defer_fn(function()
 				send()
 			end, 100)
 		end
@@ -97,20 +119,20 @@ function M.setup()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd("FileType", {
-		pattern = "markdown",
-		callback = function()
-			if not job_id then
-				vim.cmd("MarkdownPreview")
-			end
-		end,
-	})
-
 	vim.api.nvim_create_autocmd("InsertLeave", {
 		pattern = "*.md",
 		callback = function()
 			if job_id then
 				send()
+			end
+		end,
+	})
+
+	vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+		pattern = "*.md",
+		callback = function()
+			if job_id then
+				send_cursor_debounced()
 			end
 		end,
 	})

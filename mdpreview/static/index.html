@@ -32,7 +32,6 @@
         </div>
       </div>
     </div>
-
     <script>
       let latestHTML = "";
 
@@ -41,26 +40,44 @@
       const ws = new WebSocket("ws://localhost:3000/ws");
 
       let timeout;
+      let isCursorScroll = false;
 
       ws.onmessage = (e) => {
         clearTimeout(timeout);
 
         timeout = setTimeout(() => {
-          const prevScrollRatio =
-            content.scrollTop / (content.scrollHeight || 1);
-
           try {
             const data = JSON.parse(e.data);
-            latestHTML = data.html || "";
+
+            if (data.type === "cursor") {
+              isCursorScroll = true;
+
+              const totalLines = content.innerText.split("\n").length || 1;
+              const ratio = data.line / totalLines;
+
+              content.scrollTop = ratio * content.scrollHeight;
+              return;
+            }
+
+            if (data.type === "html") {
+              latestHTML = data.html;
+            }
           } catch {
             latestHTML = e.data;
           }
 
+          const prevScrollRatio =
+            content.scrollTop / (content.scrollHeight || 1);
+
           content.innerHTML = latestHTML;
           buildTOC();
 
-          content.scrollTop = prevScrollRatio * content.scrollHeight;
-        }, 100);
+          if (!isCursorScroll) {
+            content.scrollTop = prevScrollRatio * content.scrollHeight;
+          }
+
+          isCursorScroll = false;
+        }, 50);
       };
 
       function buildTOC() {

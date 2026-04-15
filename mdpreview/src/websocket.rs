@@ -30,14 +30,12 @@ async fn handle_socket(
         tokio::select! {
             msg = rx.recv() => {
                 match msg {
-                    Ok(html) => {
-                        if socket.send(Message::Text(html)).await.is_err() {
+                    Ok(message) => {
+                        if socket.send(Message::Text(message)).await.is_err() {
                             break;
                         }
                     }
-                    Err(broadcast::error::RecvError::Lagged(_)) => {
-                        continue;
-                    }
+                    Err(broadcast::error::RecvError::Lagged(_)) => continue,
                     Err(_) => break,
                 }
             }
