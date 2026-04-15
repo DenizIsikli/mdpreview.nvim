@@ -17,6 +17,11 @@
   --light-blue: #58a6ff;
 }
 
+html,
+body {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   font-family:
@@ -38,7 +43,6 @@ body {
 
 .toolbar {
   display: flex;
-  justify-content: flex-start;
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -48,8 +52,6 @@ body {
 }
 
 #content {
-  overflow: auto;
-  height: 100%;
   width: 900px;
   margin: 0 auto;
   background: var(--surface);
@@ -60,7 +62,6 @@ body {
 
 #toc {
   position: fixed;
-  justify-content: flex-start;
   left: calc(50% - 450px - 235px);
   width: 200px;
   background: var(--surface);
@@ -146,6 +147,64 @@ img {
   border-radius: 8px;
 }
 
+thead tr {
+  border-bottom: 2px solid var(--border);
+}
+
+th {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#content h1 {
+  margin-top: 0;
+}
+
+#content h2 {
+  margin-top: 32px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+#content h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+#content table {
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+#content p {
+  margin-bottom: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr {
+  border-bottom: 2px solid var(--border);
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+td code {
+  white-space: nowrap;
+}
+
+tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
 .toc-item {
   display: block;
   cursor: pointer;
@@ -188,4 +247,9 @@ img {
 }
 .toc-h6 {
   font-size: 11px;
+}
+
+input[type="checkbox"] {
+  margin-right: 6px;
+  accent-color: var(--accent);
 }

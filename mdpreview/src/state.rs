@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use serde::Serialize;
 use std::sync::{Arc, Mutex};
 use tokio::sync::broadcast;
 
@@ -13,4 +14,11 @@ pub struct AppState {
 pub struct CursorPayload {
     pub line: usize,
     pub col: usize,
+}
+
+#[derive(Serialize)]
+pub struct WsMessage {
+    pub r#type: String,
+    pub html: String,
+    pub raw: String,
 }

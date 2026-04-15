@@ -10,7 +10,7 @@ use std::{collections::HashMap, fs, path::PathBuf};
 use tokio::sync::broadcast;
 use tower_http::services::ServeDir;
 
-use crate::state::{AppState, CursorPayload};
+use crate::state::{AppState, CursorPayload, WsMessage};
 use crate::websocket::ws_handler;
 
 async fn index() -> impl IntoResponse {
@@ -61,12 +61,19 @@ pub async fn update_markdown(State(state): State<AppState>, headers: HeaderMap, 
     }
 
     let html = crate::markdown::render_markdown(&body);
+
     {
         let mut html_lock = state.html.lock().unwrap();
         *html_lock = html.clone();
     }
 
-    let _ = state.tx.send(html);
+    let msg = WsMessage {
+        r#type: "html".into(),
+        html,
+        raw: body,
+    };
+
+    let _ = state.tx.send(serde_json::to_string(&msg).unwrap());
 }
 
 pub async fn update_cursor(State(state): State<AppState>, Json(payload): Json<CursorPayload>) {

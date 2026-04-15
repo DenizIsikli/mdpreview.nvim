@@ -34,6 +34,7 @@
     </div>
     <script>
       let latestHTML = "";
+      let rawMarkdown = "";
 
       const content = document.getElementById("content");
       const tocList = document.getElementById("toc-list");
@@ -43,37 +44,44 @@
       let isCursorScroll = false;
 
       ws.onmessage = (e) => {
-        clearTimeout(timeout);
+        try {
+          const data = JSON.parse(e.data);
 
-        timeout = setTimeout(() => {
-          try {
-            const data = JSON.parse(e.data);
+          if (data.type === "cursor") {
+            const lineHeight = 20;
+            window.scrollTo({
+              top: (data.line - 1) * lineHeight,
+              behavior: "smooth",
+            });
+            return;
+          }
 
-            if (data.type === "cursor") {
-              const lineHeight = 20;
-              content.scrollTop = (data.line - 1) * lineHeight;
-              return;
-            }
+          if (data.type === "html") {
+            clearTimeout(timeout);
 
-            if (data.type === "html") {
+            timeout = setTimeout(() => {
               latestHTML = data.html;
-            }
-          } catch {
+              rawMarkdown = data.raw;
+
+              content.innerHTML = latestHTML;
+              buildTOC();
+            }, 50);
+          }
+        } catch {
+          clearTimeout(timeout);
+
+          timeout = setTimeout(() => {
             latestHTML = e.data;
-          }
 
-          const prevScrollRatio =
-            content.scrollTop / (content.scrollHeight || 1);
+            const prevScrollRatio =
+              content.scrollTop / (content.scrollHeight || 1);
 
-          content.innerHTML = latestHTML;
-          buildTOC();
+            content.innerHTML = latestHTML;
+            buildTOC();
 
-          if (!isCursorScroll) {
             content.scrollTop = prevScrollRatio * content.scrollHeight;
-          }
-
-          isCursorScroll = false;
-        }, 50);
+          }, 50);
+        }
       };
 
       function buildTOC() {
@@ -141,6 +149,18 @@
           .catch(() => {
             fallbackCopy(latestHTML);
             notify("HTML copied (fallback)!");
+          });
+      };
+
+      document.getElementById("copy-md").onclick = () => {
+        if (!rawMarkdown) return notify("No Markdown to copy");
+
+        navigator.clipboard
+          .writeText(rawMarkdown)
+          .then(() => notify("Markdown copied!"))
+          .catch(() => {
+            fallbackCopy(rawMarkdown);
+            notify("Markdown copied (fallback)!");
           });
       };
     </script>
