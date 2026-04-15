@@ -1,7 +1,16 @@
-use pulldown_cmark::{html, Event, Parser, Tag};
+use pulldown_cmark::{html, Event, Options, Parser, Tag};
 
 pub fn render_markdown(md: &str) -> String {
-    let parser = Parser::new(md);
+    let mut options = Options::empty();
+    options.insert(
+        Options::ENABLE_TABLES
+            | Options::ENABLE_STRIKETHROUGH
+            | Options::ENABLE_TASKLISTS
+            | Options::ENABLE_FOOTNOTES
+            | Options::ENABLE_SMART_PUNCTUATION,
+    );
+
+    let parser = Parser::new_ext(md, options);
 
     let mapped = parser.map(|event| match event {
         Event::Start(Tag::Image(link_type, dest, title)) => {
