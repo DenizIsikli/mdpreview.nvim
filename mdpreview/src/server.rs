@@ -13,22 +13,8 @@ use tower_http::services::ServeDir;
 use crate::state::{AppState, CursorPayload, WsMessage};
 use crate::websocket::ws_handler;
 
-async fn index() -> impl IntoResponse {
-    let exe_dir = std::env::current_exe()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf();
-
-    let static_path = if exe_dir.ends_with("debug") || exe_dir.ends_with("release") {
-        exe_dir.join("../../static")
-    } else {
-        exe_dir.join("../mdpreview/static")
-    }
-    .canonicalize()
-    .unwrap();
-
-    Html(std::fs::read_to_string(static_path.join("index.html")).unwrap())
+async fn index(State(state): State<AppState>) -> impl IntoResponse {
+    Html(std::fs::read_to_string(state.static_path.join("index.html")).unwrap())
 }
 
 async fn img(
@@ -88,12 +74,6 @@ pub async fn update_cursor(State(state): State<AppState>, Json(payload): Json<Cu
 pub async fn run() {
     let (tx, _) = broadcast::channel::<String>(100);
 
-    let state = AppState {
-        html: std::sync::Arc::new(std::sync::Mutex::new(String::new())),
-        tx,
-        base_dir: std::sync::Arc::new(std::sync::Mutex::new(String::new())),
-    };
-
     let exe_dir = std::env::current_exe()
         .unwrap()
         .parent()
@@ -107,6 +87,13 @@ pub async fn run() {
     }
     .canonicalize()
     .unwrap();
+
+    let state = AppState {
+        html: std::sync::Arc::new(std::sync::Mutex::new(String::new())),
+        tx,
+        base_dir: std::sync::Arc::new(std::sync::Mutex::new(String::new())),
+        static_path: static_path.clone(),
+    };
 
     let app = Router::new()
         .route("/", get(index))

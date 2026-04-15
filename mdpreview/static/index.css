@@ -60,22 +60,22 @@ body {
   box-shadow: 0 0 0 1px var(--border);
 }
 
-a {
-  color: var(--light-blue);
-  text-decoration: none;
+#content p a,
+#content a {
+  color: green !important;
 }
 
-a:visited {
-  color: #8ab4f8;
+#content a:visited {
+  color: var(--light-blue) !important;
 }
 
-a:hover {
-  color: var(--accent);
+#content a:hover {
+  color: var(--accent) !important;
   text-decoration: underline;
 }
 
-a:active {
-  color: var(--primary);
+#content a:active {
+  color: var(--primary) !important;
 }
 
 #toc {

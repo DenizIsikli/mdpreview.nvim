@@ -8,6 +8,7 @@ pub struct AppState {
     pub html: Arc<Mutex<String>>,
     pub tx: broadcast::Sender<String>,
     pub base_dir: Arc<Mutex<String>>,
+    pub static_path: std::path::PathBuf,
 }
 
 #[derive(Deserialize)]
