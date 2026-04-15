@@ -50,12 +50,8 @@
             const data = JSON.parse(e.data);
 
             if (data.type === "cursor") {
-              isCursorScroll = true;
-
-              const totalLines = content.innerText.split("\n").length || 1;
-              const ratio = data.line / totalLines;
-
-              content.scrollTop = ratio * content.scrollHeight;
+              const lineHeight = 20;
+              content.scrollTop = (data.line - 1) * lineHeight;
               return;
             }
 

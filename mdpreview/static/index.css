@@ -48,6 +48,8 @@ body {
 }
 
 #content {
+  overflow: auto;
+  height: 100%;
   width: 900px;
   margin: 0 auto;
   background: var(--surface);
