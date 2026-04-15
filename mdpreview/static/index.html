@@ -58,6 +58,7 @@
 
           if (data.type === "html") {
             clearTimeout(timeout);
+            colorMdLinks(data.html);
 
             timeout = setTimeout(() => {
               latestHTML = data.html;
@@ -83,6 +84,34 @@
           }, 50);
         }
       };
+
+      function colorMdLinks(html) {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+
+        const links = tempDiv.querySelectorAll("a");
+
+        links.forEach((link) => {
+          link.style.color = "var(--light-blue)";
+          link.style.textDecoration = "none";
+
+          link.onmouseover = () => {
+            link.style.color = "var(--accent)";
+            link.style.textDecoration = "underline";
+          };
+
+          link.onmouseout = () => {
+            link.style.color = "var(--light-blue)";
+            link.style.textDecoration = "none";
+          };
+
+          link.onmousedown = () => {
+            link.style.color = "var(--primary)";
+          };
+        });
+
+        latestHTML = tempDiv.innerHTML;
+      }
 
       function buildTOC() {
         tocList.innerHTML = "";
