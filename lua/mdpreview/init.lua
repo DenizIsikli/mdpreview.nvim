@@ -20,14 +20,11 @@ local function send()
 	}, { detach = true })
 end
 
-local function send_debounced()
-	if timer then
-		timer:stop()
-	end
+local timer = vim.loop.new_timer()
 
-	timer = vim.defer_fn(function()
-		send()
-	end, 400)
+local function send_debounced()
+	timer:stop()
+	timer:start(400, 0, vim.schedule_wrap(send))
 end
 
 function M.setup()
@@ -54,7 +51,7 @@ function M.setup()
 
 			vim.schedule(function()
 				send()
-			end)
+			end, 100)
 		end
 
 		vim.defer_fn(function()
@@ -89,7 +86,16 @@ function M.setup()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "TextChanged", "BufEnter", "BufWritePost" }, {
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = "markdown",
+		callback = function()
+			if not job_id then
+				vim.cmd("MarkdownPreview")
+			end
+		end,
+	})
+
+	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "BufWritePost" }, {
 		pattern = "*.md",
 		callback = function()
 			if job_id then

@@ -17,6 +17,15 @@ async fn handle_socket(
     _state: AppState,
     mut rx: broadcast::Receiver<String>,
 ) {
+    let initial_html = {
+        let html = _state.html.lock().unwrap();
+        html.clone()
+    };
+
+    if !initial_html.is_empty() {
+        let _ = socket.send(Message::Text(initial_html)).await;
+    }
+
     loop {
         tokio::select! {
             msg = rx.recv() => {
