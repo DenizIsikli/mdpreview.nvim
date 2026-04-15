@@ -29,29 +29,37 @@ Using lazy.nvim:
     require("mdpreview").setup()
   end
 }
+```
 
 ## Usage
 
-1. Open a Markdown file (`.md`) in Neovim
+1. Open a Markdown file in Neovim:
+
+```bash
+nvim README.md
+```
 
 2. Start the preview:
 
+```vim
 :MarkdownPreview
+```
 
-* This starts the Rust backend
-* Opens your browser at http://localhost:3000
+- Starts the Rust backend  
+- Opens your browser at http://localhost:3000  
 
 3. Edit your Markdown file
 
-* Changes update automatically in the browser
-* Cursor position is synced in real time
+- Changes update automatically in the browser  
+- Cursor position is synced in real time  
 
 4. Stop the preview (optional):
 
+```vim
 :MarkdownPreviewStop
+```
 
-* The server will also stop automatically when leaving Neovim or switching away from Markdown files
-
+- The server stops automatically when leaving Neovim or switching filetypes
 
 ## Architecture
 
