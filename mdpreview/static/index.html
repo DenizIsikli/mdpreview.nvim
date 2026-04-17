@@ -87,10 +87,10 @@
       function copyCodeBlocks() {
         const codeBlocks = content.querySelectorAll("pre > code");
         codeBlocks.forEach((code) => {
-          const buttton = document.createElement("button");
-          buttton.textContent = "Copy";
-          buttton.className = "copy-code-btn";
-          buttton.onclick = () => {
+          const button = document.createElement("button");
+          button.textContent = "Copy";
+          button.className = "copy-code-btn";
+          button.onclick = () => {
             const text = code.textContent;
             navigator.clipboard
               .writeText(text)
@@ -101,7 +101,7 @@
               });
           };
 
-          code.parentElement.appendChild(buttton);
+          code.parentElement.appendChild(button);
         });
       }
 
