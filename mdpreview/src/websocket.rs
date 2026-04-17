@@ -5,7 +5,7 @@ use axum::extract::{
 use axum::response::IntoResponse;
 use tokio::sync::broadcast;
 
-use crate::state::AppState;
+use crate::state::{AppState, WsMessage};
 
 pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
     let rx = state.tx.subscribe();
@@ -23,7 +23,15 @@ async fn handle_socket(
     };
 
     if !initial_html.is_empty() {
-        let _ = socket.send(Message::Text(initial_html)).await;
+        let msg = WsMessage {
+            r#type: "html".into(),
+            html: initial_html,
+            raw: String::new(),
+        };
+
+        let _ = socket
+            .send(Message::Text(serde_json::to_string(&msg).unwrap()))
+            .await;
     }
 
     loop {
