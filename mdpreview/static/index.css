@@ -223,12 +223,46 @@ tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.02);
 }
 
+pre {
+  background: var(--surface-2);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  position: relative;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: var(--text);
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--code-bg);
+  color: var(--text);
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.copy-code-btn:hover {
+  opacity: 1;
+  background: var(--border);
+}
+
 .toc-item {
   display: block;
   cursor: pointer;
   margin: 6px 0;
   padding-left: 10px;
   color: var(--text);
+  transition: color 0.3s;
 }
 
 .toc-item::before {
@@ -238,10 +272,6 @@ tr:nth-child(even) {
 
 .toc-item:hover {
   color: var(--light-blue);
-  font-weight: 600;
-  transition:
-    color 0.3s,
-    font-weight 0.3s;
 }
 
 .toc-item:hover::before {
