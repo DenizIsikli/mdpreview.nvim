@@ -6,6 +6,7 @@ local timer = vim.loop.new_timer()
 local cursor_timer = vim.loop.new_timer()
 
 function M.send()
+	print("SENDING:", vim.fn.expand("%:p"))
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 	local content = table.concat(lines, "\n")
 	local file_dir = vim.fn.expand("%:p:h")

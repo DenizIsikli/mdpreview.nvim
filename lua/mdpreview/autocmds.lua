@@ -11,7 +11,7 @@ function M.setup()
 				else
 					vim.defer_fn(function()
 						core.send()
-					end, 50)
+					end, 100)
 				end
 			else
 				core.stop()
