@@ -1,6 +1,7 @@
 local M = {}
 
 M.job_id = nil
+M.started = false
 
 local timer = vim.loop.new_timer()
 local cursor_timer = vim.loop.new_timer()
@@ -68,6 +69,7 @@ function M.start()
 				end
 			end,
 		})
+		M.started = true
 
 		vim.defer_fn(function()
 			M.send()
@@ -80,6 +82,7 @@ function M.stop()
 		vim.fn.jobstop(M.job_id)
 		M.job_id = nil
 	end
+	M.started = false
 end
 
 function M.running()

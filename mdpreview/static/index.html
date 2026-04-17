@@ -43,66 +43,56 @@
       let isCursorScroll = false;
 
       ws.onmessage = (e) => {
+        let data;
+
         try {
-          const data = JSON.parse(e.data);
-
-          if (data.type === "cursor") {
-            const lineHeight = 20;
-            window.scrollTo({
-              top: (data.line - 1) * lineHeight,
-              behavior: "smooth",
-            });
-            return;
-          }
-
-          if (data.type === "html") {
-            clearTimeout(timeout);
-
-            timeout = setTimeout(() => {
-              latestHTML = data.html;
-              rawMarkdown = data.raw;
-
-              content.innerHTML = latestHTML;
-              copyCodeBlocks();
-              buildTOC();
-            }, 50);
-          }
+          data = JSON.parse(e.data);
         } catch {
+          console.warn("Non-JSON message, skipping");
+          return;
+        }
+
+        if (data.type === "cursor") {
+          const lineHeight = 20;
+          window.scrollTo({
+            top: (data.line - 1) * lineHeight,
+            behavior: "smooth",
+          });
+          return;
+        }
+
+        if (data.type === "html") {
           clearTimeout(timeout);
 
           timeout = setTimeout(() => {
-            latestHTML = e.data;
-
-            const prevScrollRatio =
-              content.scrollTop / (content.scrollHeight || 1);
+            latestHTML = data.html;
+            rawMarkdown = data.raw;
 
             content.innerHTML = latestHTML;
+            copyCodeBlocks();
             buildTOC();
-
-            content.scrollTop = prevScrollRatio * content.scrollHeight;
           }, 50);
         }
       };
 
       function copyCodeBlocks() {
         const codeBlocks = content.querySelectorAll("pre code");
+
         codeBlocks.forEach((code) => {
+          const pre = code.closest("pre");
+
+          if (pre.querySelector(".copy-code-btn")) return;
+
           const button = document.createElement("button");
           button.textContent = "Copy";
           button.className = "copy-code-btn";
-          button.onclick = () => {
-            const text = code.textContent;
-            navigator.clipboard
-              .writeText(text)
-              .then(() => notify("Code copied!"))
-              .catch(() => {
-                fallbackCopy(text);
-                notify("Code copied (fallback)!");
-              });
-          };
-        });
 
-        code.parentElement.appendChild(button);
+          button.onclick = () => {
+            navigator.clipboard.writeText(code.textContent);
+          };
+
+          pre.appendChild(button);
+        });
       }
 
       function buildTOC() {

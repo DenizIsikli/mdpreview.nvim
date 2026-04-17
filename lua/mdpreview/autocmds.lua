@@ -6,11 +6,11 @@ function M.setup()
 	vim.api.nvim_create_autocmd("BufEnter", {
 		callback = function()
 			if vim.bo.filetype == "markdown" then
-				if core.running() then
-					core.send()
+				if core.running() and core.started then
+					vim.defer_fn(function()
+						core.send()
+					end, 100)
 				end
-			else
-				core.stop()
 			end
 		end,
 	})
