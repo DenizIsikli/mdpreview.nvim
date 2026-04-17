@@ -86,6 +86,7 @@
 
       function copyCodeBlocks() {
         const codeBlocks = content.querySelectorAll("pre code");
+        console.log("FOUND:", codeBlocks.length);
 
         codeBlocks.forEach((code) => {
           const pre = code.closest("pre");
