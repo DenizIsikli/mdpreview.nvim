@@ -5,7 +5,13 @@ local M = {}
 function M.setup()
 	vim.api.nvim_create_autocmd("BufEnter", {
 		callback = function()
-			if vim.bo.filetype ~= "markdown" then
+			if vim.bo.filetype == "markdown" then
+				if not core.running() then
+					core.start()
+				else
+					core.send()
+				end
+			else
 				core.stop()
 			end
 		end,
@@ -26,20 +32,20 @@ function M.setup()
 		end,
 	})
 
-	vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-		pattern = "*.md",
-		callback = function()
-			if core.running() then
-				core.send_cursor_debounced()
-			end
-		end,
-	})
-
 	vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "TextChangedP", "BufWritePost" }, {
 		pattern = "*.md",
 		callback = function()
 			if core.running() then
 				core.send_debounced()
+			end
+		end,
+	})
+
+	vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+		pattern = "*.md",
+		callback = function()
+			if core.running() then
+				core.send_cursor_debounced()
 			end
 		end,
 	})
