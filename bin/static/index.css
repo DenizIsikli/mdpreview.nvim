@@ -1,0 +1,303 @@
+:root {
+  --bg: #0f1117;
+  --surface: #161b22;
+  --surface-2: #0d1117;
+  --border: #30363d;
+
+  --text: #e6edf3;
+  --muted: #7d8590;
+
+  --primary: #238636;
+  --primary-hover: #2ea043;
+
+  --accent: #2f81f7;
+
+  --code-bg: #21262d;
+  --bullet-color: #fff;
+  --light-blue: #58a6ff;
+}
+
+html,
+body {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+#wrapper {
+  width: 100%;
+  max-width: 900px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+#main {
+  position: relative;
+}
+
+#content {
+  width: 900px;
+  margin: 0 auto;
+  background: var(--surface);
+  padding: 32px;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+#content p a,
+#content a {
+  color: green !important;
+}
+
+#content a:visited {
+  color: var(--light-blue) !important;
+}
+
+#content a:hover {
+  color: var(--accent) !important;
+  text-decoration: underline;
+}
+
+#content a:active {
+  color: var(--primary) !important;
+}
+
+#toc {
+  position: fixed;
+  left: calc(50% - 450px - 235px);
+  width: 200px;
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+#toc ul {
+  list-style: none;
+}
+
+#toc summary {
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+#toc[open] summary {
+  margin-bottom: 10px;
+}
+
+button {
+  background: var(--code-bg);
+  color: var(--text);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: var(--border);
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 1.2em;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+p {
+  margin: 0.8em 0;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin: 6px 0;
+}
+
+code {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+pre {
+  background: var(--surface-2);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.placeholder {
+  color: var(--muted);
+  text-align: center;
+  margin-top: 40px;
+}
+
+img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+thead tr {
+  border-bottom: 2px solid var(--border);
+}
+
+th {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#content h1 {
+  margin-top: 0;
+}
+
+#content h2 {
+  margin-top: 32px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+#content h3 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+#content table {
+  margin-top: 12px;
+  margin-bottom: 24px;
+}
+
+#content p {
+  margin-bottom: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead tr {
+  border-bottom: 2px solid var(--border);
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+td code {
+  white-space: nowrap;
+}
+
+tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+pre {
+  background: var(--surface-2);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  position: relative;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: var(--text);
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--code-bg);
+  color: var(--text);
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.copy-code-btn:hover {
+  opacity: 1;
+  background: var(--border);
+}
+
+.toc-item {
+  display: block;
+  cursor: pointer;
+  margin: 6px 0;
+  padding-left: 10px;
+  color: var(--text);
+  transition: color 0.3s;
+}
+
+.toc-item::before {
+  content: "• ";
+  color: var(--bullet-color);
+}
+
+.toc-item:hover {
+  color: var(--light-blue);
+}
+
+.toc-item:hover::before {
+  color: var(--light-blue);
+}
+
+.toc-h1 {
+  font-size: 16px;
+}
+.toc-h2 {
+  font-size: 15px;
+}
+.toc-h3 {
+  font-size: 14px;
+}
+.toc-h4 {
+  font-size: 13px;
+}
+.toc-h5 {
+  font-size: 12px;
+}
+.toc-h6 {
+  font-size: 11px;
+}
+
+input[type="checkbox"] {
+  margin-right: 6px;
+  accent-color: var(--accent);
+}
