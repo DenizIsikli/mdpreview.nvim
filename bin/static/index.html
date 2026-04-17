@@ -32,6 +32,8 @@
       </div>
     </div>
     <script>
+      console.log("NEW HTML LOADED");
+
       let latestHTML = "";
       let rawMarkdown = "";
 
@@ -85,24 +87,21 @@
       };
 
       function copyCodeBlocks() {
-        const codeBlocks = content.querySelectorAll("pre code");
-        console.log("FOUND:", codeBlocks.length);
-
+        const codeBlocks = content.querySelectorAll("pre > code");
         codeBlocks.forEach((code) => {
-          const pre = code.closest("pre");
-
-          if (pre.querySelector(".copy-code-btn")) return;
-
-          const button = document.createElement("button");
-          button.textContent = "Copy";
-          button.className = "copy-code-btn";
-
-          button.onclick = () => {
+          const buttton = document.createElement("button");
+          buttton.textContent = "Copy";
+          buttton.className = "copy-code-btn";
+          buttton.onclick = () => {
             const text = code.textContent;
-            navigator.clipboard.writeText(text);
+            navigator.clipboard
+              .writeText(text)
+              .then(() => notify("Code copied!"))
+              .catch(() => {
+                fallbackCopy(text);
+                notify("Code copied (fallback)!");
+              });
           };
-
-          pre.appendChild(button);
         });
       }
 
@@ -139,7 +138,7 @@
 
       function notify(msg) {
         if (Notification.permission === "granted") {
-          new Notification(msg, { silent: true });
+          new Notification(msg);
         } else if (Notification.permission !== "denied") {
           Notification.requestPermission().then((perm) => {
             if (perm === "granted") {
