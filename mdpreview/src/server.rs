@@ -80,7 +80,7 @@ pub async fn run() {
         .unwrap()
         .to_path_buf();
 
-    let static_path = exe_dir.join("../../../static").canonicalize().unwrap();
+    let static_path = exe_dir.join("static").canonicalize().unwrap();
 
     let state = AppState {
         html: std::sync::Arc::new(std::sync::Mutex::new(String::new())),
