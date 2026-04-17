@@ -9,7 +9,9 @@ function M.setup()
 				if not core.running() then
 					core.start()
 				else
-					core.send()
+					vim.defer_fn(function()
+						core.send()
+					end, 50)
 				end
 			else
 				core.stop()
