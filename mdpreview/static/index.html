@@ -97,7 +97,13 @@
           button.className = "copy-code-btn";
 
           button.onclick = () => {
-            navigator.clipboard.writeText(code.textContent);
+            navigator.clipboard
+              .writeText(code.textContent)
+              .then(() => notify("Code copied!"))
+              .catch(() => {
+                fallbackCopy(code.textContent);
+                notify("Code copied (fallback)!");
+              });
           };
 
           pre.appendChild(button);
